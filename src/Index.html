@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top"/>
+    <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.css" rel="stylesheet">
+    <?!= include('vue_css'); ?>
+  </head>
+
+  <body>
+    <div id="app">
+      <v-app>
+        <v-toolbar color="black" dark flat>
+          <v-toolbar-title>Document Approval</v-toolbar-title>
+        </v-toolbar>
+        <v-content>
+          <v-container fluid fill-height>
+            <v-layout justify-center align-start>
+              <v-flex md8 lg6>
+                <v-form v-model="valid" ref="uploadForm" lazy-validation class="white">
+                  <v-container>
+                    <v-layout row wrap>
+                      <v-flex xs12>
+                        <h2 class="title mb-3">Title</h2>
+                        <p>Description.</p>
+                      </v-flex>
+                      <v-flex xs12 class="text-xs-center grey lighten-4">
+                        <v-btn @click.native="openFileDialog" large depressed color="secondary">
+                          <v-icon right dark>attach_file</v-icon>
+                          <span>Select document</span>
+                        </v-btn>
+                        <input type="file" style="display: none;" ref="uploadFileInput" @change="onFileChange"
+                          accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/msword, application/pdf, image/*"
+                        />
+                        <div class="my-2" v-if="file">File name: <strong>{{ file.name }}</strong></div>
+                      </v-flex>
+                      <v-flex xs12>
+                        <v-textarea v-model="fields.custom_field" label="Custom Field" :rules="[v => !!v || 'This field cannot be empty']"></v-textarea>
+                      </v-flex>
+                      <v-flex xs12>
+                        <v-btn @click.native="uploadContract" large depressed :disabled="!valid || loading" :loading="loading" color="primary">Submit</v-btn>
+                      </v-flex>
+                    </v-layout>
+                  </v-container>
+                </v-form>
+              </v-flex>
+            </v-layout>
+          </v-container>
+        </v-content>
+        <dialog-loading ref="dialogLoading"></dialog-loading>
+        <dialog-response ref="dialogResponse"></dialog-response>
+      </v-app>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.js"></script>
+    <?!= include('vue_DialogLoading'); ?>
+    <?!= include('vue_DialogResponse'); ?>
+    <?!= include('vue_FormDatepicker'); ?>
+    <?!= include('Index_script_js'); ?>
+  </body>
+</html>

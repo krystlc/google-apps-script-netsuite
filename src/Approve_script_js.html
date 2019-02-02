@@ -1,0 +1,72 @@
+<script>
+  const app = new Vue({
+    el: '#app',
+    data: {
+      dialog: false,
+      show: false,
+      loading: false,
+      valid: false,
+      wid: null,
+      response: null,
+      title: '',
+      message: 'loading...',
+      document: null
+    },
+    created() {
+      google.script.url.getLocation(location => {
+        this.wid = location.parameters.wid[0]
+        google.script.run
+          .withSuccessHandler(this.handleWFStatus)
+          .withFailureHandler(this.responseFailure)
+          .getSCMWorkflowStatus(this.wid)
+        if (location.parameters.response[0] === 'Approve') this.response =  true
+        if (location.parameters.response[0] === 'Decline') this.response =  false
+      })
+    },
+    methods: {
+      handleWFStatus(res) {
+        console.log(res)
+        this.document = res.Info
+        if (res.Status === 'Completed') {
+          this.title = 'Thanks!'
+          this.message = 'Your response was logged ' + res.EndDate
+        } else if (res.Status === 'Waiting') {
+          this.message = ''
+          this.dialog = true
+        }
+      },
+      submitResponse() {
+        if (this.$refs.responseForm.validate()) {
+          this.handleLoading(true)
+          google.script.run
+            .withSuccessHandler(this.responseSuccess)
+            .withFailureHandler(this.responseFailure)
+            .handleResponse(this.wid, this.response)
+          this.dialog = false
+        } else {
+          this.$refs.dialogResponse.open('Please select an action', 'warning', 'Oops!')
+        }
+      },
+      responseSuccess(res) {
+        console.info(res)
+        this.handleLoading(false)
+        try {
+          this.message = res.Error ? res.Error.UserMessage : 'Your response was logged.'
+          this.title = res.Error ? 'Error' : 'Thanks!'
+        }
+        catch(err) {
+          this.responseFailure('Something went wrong.')
+        }
+      },
+      responseFailure(err) {
+        console.error(err)
+        this.handleLoading(false)
+        this.$refs.dialogResponse.open(err, 'error--text', 'Error')
+      },
+      handleLoading(state) {
+        this.loading = state
+        this.$refs.dialogLoading._data.show = state
+      }
+    }
+  })
+</script>

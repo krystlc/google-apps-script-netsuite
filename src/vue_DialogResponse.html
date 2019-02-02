@@ -1,0 +1,53 @@
+<script>
+  Vue.component('dialog-response', {
+    template:
+      '<v-dialog \
+        v-model="show" \
+        max-width="290" \
+        primary-title \
+      > \
+        <v-card> \
+          <v-card-title class="headline" :class="color" v-if="title">{{ title }}</v-card-title> \
+          <v-card-text> \
+            {{ msg }} \
+          </v-card-text> \
+          <v-card-actions> \
+            <v-spacer></v-spacer> \
+            <v-btn \
+              flat="flat" \
+              @click="show = false" \
+            > \
+              Close \
+            </v-btn> \
+          </v-card-actions> \
+        </v-card> \
+      </v-dialog>',
+    data() {
+      return {
+        show: false,
+        msg: '',
+        title: null,
+        color: '',
+        close: null
+      }
+    },
+    methods: {
+      open(msg, color, title, close) {
+        this.show = true
+        this.msg = msg
+        this.color = color
+        this.title = title
+        // gotta rethink this close argument
+        if (close) this.close = true
+      },
+      // do we really need this function?
+      closeWindow() {
+        if (this.close) {
+          close()
+        } else {
+          this.show = false
+        }
+      }
+    }
+  })
+</script>

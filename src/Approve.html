@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top"/>
+    <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.css" rel="stylesheet">
+    <?!= include('vue_css'); ?>
+  </head>
+
+  <body>
+    <div id="app">
+      <v-app>
+        <v-toolbar color="black" dark flat>
+          <v-toolbar-title>Document Approval</v-toolbar-title>
+        </v-toolbar>
+        <v-content>
+          <v-responsive>
+            <v-container fill-height>
+              <v-layout align-center>
+                <v-flex class="text-xs-center">
+                  <h2 class="display-2">{{ title }}</h2>
+                  <p class="subheading">{{ message }}</p>
+                </v-flex>
+              </v-layout>
+            </v-container>
+          </v-responsive>
+        </v-content>
+        <v-dialog v-model="dialog" persistent max-width="320">
+          <v-card>
+            <v-card-title primary-title>
+              <span>{{ document }}</span>
+            </v-card-title>
+            <v-card-text>
+              <v-form v-model="valid" ref="responseForm" lazy-validation>
+                <v-container>
+                  <v-layout row wrap>
+                    <v-flex xs12>
+                      <div class="text-xs-center" v-if="response === true">
+                        <v-icon size="72" color="success">check</v-icon>
+                        <p><strong>Approve</strong> document</p>
+                      </div>
+                      <div class="text-xs-center" v-if="response === false">
+                        <v-icon size="72" color="error">not_interested</v-icon>
+                        <p><strong>Decline</strong> document</p>
+                      </div>
+                    </v-flex>
+                    <v-flex xs12 v-show="show">
+                      <v-text-field v-model="response" label="Response" :rules="[v => typeof v === 'boolean' || 'This field cannot be empty']" disabled></v-text-field>
+                    </v-flex>
+                  </v-layout>
+                </v-container>
+              </v-form>
+            </v-card-text>
+            <v-card-actions>
+              <v-btn @click="response = true" flat icon color="success" :disabled="response === true">
+                <v-icon>check</v-icon>
+              </v-btn>
+              <v-btn @click="response = false" flat icon color="error" :disabled="response === false">
+                <v-icon>not_interested</v-icon>
+              </v-btn>
+              <v-spacer></v-spacer>
+              <v-btn @click.native="submitResponse" depressed :disabled="!valid || loading" :loading="loading" color="primary">
+                Submit
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+        <dialog-loading ref="dialogLoading"></dialog-loading>
+        <dialog-response ref="dialogResponse"></dialog-response>
+      </v-app>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.js"></script>
+    <?!= include('vue_DialogLoading'); ?>
+    <?!= include('vue_DialogResponse'); ?>
+    <?!= include('Approve_script_js'); ?>
+  </body>
+</html>

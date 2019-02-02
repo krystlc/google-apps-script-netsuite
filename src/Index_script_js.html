@@ -1,0 +1,62 @@
+<script>
+  const app = new Vue({
+    el: '#app',
+    data: {
+      file: '',
+      show: false,
+      loading: false,
+      valid: false,
+      fields: {
+        custom_field: ''
+      },
+      params: null
+    },
+    created() {
+      google.script.url.getLocation(location => {
+        // try statement here in case id or type is missing
+        this.params = location.parameter
+      })
+    },
+    methods: {
+      openFileDialog() {
+        this.$refs.uploadFileInput.click()
+      },
+      onFileChange(e) {
+        this.file = e.target.files[0] || e.dataTransfer.files[0]
+      },
+      uploadContract() {
+        if (this.$refs.uploadForm.validate() && this.file && this.params) {
+          const reader = new FileReader()
+
+          reader.onloadend = e => {
+            this.handleLoading(true)
+            google.script.run
+              .withSuccessHandler(this.uploadSuccess)
+              .withFailureHandler(this.uploadFailure)
+              .uploadContractToSCM(this.params, this.fields, e.target.result, this.file.name)
+          }
+          reader.readAsDataURL(this.file)
+        } else {
+          this.$refs.dialogResponse.open('It looks like something is missing...', 'warning', 'Oops!', false)
+        }
+      },
+      uploadSuccess(res) {
+        this.handleLoading(false)
+        console.info(res)
+        const str = res.Error ? res.Error.DeveloperMessage : 'All good.'
+        const type = res.Error ? 'error--text' : 'success--text'
+        const title = res.Error ? 'Error' : 'Great Success!'
+        this.$refs.dialogResponse.open(str, type, title, true)
+      },
+      uploadFailure(err) {
+        this.handleLoading(false)
+        console.error(err)
+        this.$refs.dialogResponse.open(err, 'error--text', 'Error', false)
+      },
+      handleLoading(state) {
+        this.loading = state
+        this.$refs.dialogLoading._data.show = state
+      }
+    }
+  })
+</script>

@@ -1,0 +1,54 @@
+<script>
+  Vue.component('form-datepicker', {
+    template:
+      '<v-menu \
+        ref="menu" \
+        :close-on-content-click="false" \
+        v-model="menu" \
+        :nudge-right="40" \
+        lazy \
+        transition="scale-transition" \
+        offset-y \
+        full-width \
+        max-width="290px" \
+        min-width="290px" \
+        class="v-text-field" \
+      > \
+        <v-text-field \
+          slot="activator" \
+          v-model="field" \
+          :label="label" \
+          hint="MM/DD/YYYY format" \
+          persistent-hint \
+          @blur="date = parseDate(field)" \
+          style="margin: 0; padding: 0;" \
+          readonly \
+        ></v-text-field> \
+        <v-date-picker v-model="date" no-title @input="menu = false"></v-date-picker> \
+      </v-menu>',
+    props: ['field', 'label'],
+    data() {
+      return {
+        date: null,
+        menu: false
+      }
+    },
+    watch: {
+      date(val) {
+        this.$emit('update:field', this.formatDate(this.date))
+      }
+    },
+    methods: {
+      formatDate(date) {
+        if (!date) return null
+        const [year, month, day] = date.split('-')
+        return `${month}/${day}/${year}`
+      },
+      parseDate(date) {
+        if (!date) return null
+        const [month, day, year] = date.split('/')
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
+      }
+    }
+  })
+</script>
